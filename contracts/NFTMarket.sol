@@ -97,4 +97,52 @@ contract NFTMarket is ReentrancyGuard {
         payable(owner).transfer(listingPrice);
 
     }
+
+    function fetchMarketItems() public view returns(MarketItem[] memory) {
+        uint _ItemCount = _ItemIDs.current();
+        uint unsoldItemCount = _ItemIDs.current() - _ItemsSold.current();
+        uint currentIndex = 0;
+
+        MarketItem[] memory items = new MarketItem[](unsoldItemCount);
+
+        for (uint i = 0; i < _ItemCount; i++) {
+            if(idToMarketItem[i+1].owner == address(0)) {
+                uint currentID = idToMarketItem[i+1].ItemID;
+                MarketItem storage currentItem = idToMarketItem[currentID];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+
+        return items;
+    }
+
+    function fetchMyNFTs() public view returns (MarketItem[] memory) {
+        uint totalItemCount = _ItemIDs.current();
+        uint currentIndex = 0;
+        MarketItem[] memory items = new MarketItem[](totalItemCount);
+
+        for (uint i = 0; i< totalItemCount; i++) {
+            if(idToMarketItem[i+1].owner == msg.sender) {
+                items[currentIndex] = idToMarketItem[i + 1];
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
+
+    function fetchNFTsCreated() public view returns(MarketItem[] memory) {
+        uint totalItemCount = _ItemIDs.current();
+        uint currentIndex = 0;
+        MarketItem[] memory items = new MarketItem[](totalItemCount);
+
+        for (uint i = 0; i < totalItemCount; i++) {
+            if(idToMarketItem[i+1].seller == msg.sender) {
+                items[currentIndex] = idToMarketItem[i+1];
+                currentIndex += 1;
+            }
+        }
+
+        return items;
+    }
 }
